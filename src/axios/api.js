@@ -1,12 +1,15 @@
 import axios from "axios";
 import Cookies from "js-cookie";
 
-const token = Cookies.get("token");
 const api = axios.create({
   baseURL: "https://fullstack-backend-8lkr.onrender.com/api/",
-  headers: {
-    Authorization: token || "",
-  },
 });
+
+api.interceptors.request.use((req)=>{
+  if(Cookies.get("token")){
+    req.headers.Authorization=Cookies.get("token")
+  }
+  return req
+})
 
 export default api;

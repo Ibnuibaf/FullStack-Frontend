@@ -19,9 +19,8 @@ function Header() {
   },[])
   const logoutUser=async()=>{
     try {
-      const res=await api.get('/user/logout')
       Cookies.remove("token")
-      toast.success(res.data.message)
+      toast.success("User Logout")
       navigate('/')
     } catch (error) {
       console.log(error);
