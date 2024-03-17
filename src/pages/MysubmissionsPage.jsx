@@ -1,8 +1,10 @@
 import React from "react";
 import Header from "../components/common/Header";
 import ReviewsTab from "../components/tables/ReviewsTab";
+import useTokenValidation from "../hooks/useTokenValidation";
 
 function MysubmissionsPage() {
+  useTokenValidation()
   return (
     <div className="">
       <Header />

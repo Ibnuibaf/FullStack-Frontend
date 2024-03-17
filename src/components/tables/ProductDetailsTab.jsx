@@ -19,17 +19,19 @@ function ProductDetailsTab() {
   const [imageFile, setImageFile] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const getProductDetails = async () => {
-    await dispatch(getProducts);
-    const details = products.data.find((product) => product._id == productId);
-    setProductDetail(details);
+    dispatch(getProducts);
+    if (products.data.length) {
+      const details = products.data.find((product) => product._id == productId);
+      setProductDetail(details);
+    }
   };
   const handleOnChange = (e) => {
     setProductDetail({ ...productDetail, [e.target.name]: e.target.value });
   };
-  const updateImageFile=(img)=>{
-    setImageFile(img)
+  const updateImageFile = (img) => {
+    setImageFile(img);
     console.log(img);
-  }
+  };
   const requestChange = async () => {
     try {
       if (
@@ -159,7 +161,12 @@ function ProductDetailsTab() {
                   onClick={() => setIsModalOpen(true)}
                   className="w-52 h-52 object-cover rounded-md mb-4 cursor-pointer"
                 />
-                {isModalOpen && <Modal closeModal={()=>setIsModalOpen(false)} updateImageFile={updateImageFile} />}
+                {isModalOpen && (
+                  <Modal
+                    closeModal={() => setIsModalOpen(false)}
+                    updateImageFile={updateImageFile}
+                  />
+                )}
               </>
               // </label>
             )

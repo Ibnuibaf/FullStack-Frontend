@@ -9,6 +9,7 @@ const useTokenValidation = () => {
   useEffect(() => {
     const token = Cookies.get('token');
     if (!token) {
+      toast.error("Login in to your account")
       navigate('/login');
     }
   }, [navigate]);
