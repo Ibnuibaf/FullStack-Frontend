@@ -2,15 +2,20 @@ import React, { useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { selectProducts } from "../../redux/slices/productsSlice";
 import { getProducts } from "../../redux/actions/productsActions";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import { selectUser } from "../../redux/slices/userSlice";
+import toast from "react-hot-toast";
+import api from "../../axios/api";
+import Modal from "../common/Modal";
 
 function ProductDetailsTab() {
   const dispatch = useDispatch();
+  const navigate = useNavigate();
   const products = useSelector(selectProducts);
   const user = useSelector(selectUser);
   const { productId } = useParams();
   const [productDetail, setProductDetail] = useState({});
+  const [isModalOpen, setIsModalOpen] = useState(false);
   const [imageFile, setImageFile] = useState(null);
   const [isEditMode, setIsEditMode] = useState(false);
   const getProductDetails = async () => {
@@ -20,6 +25,84 @@ function ProductDetailsTab() {
   };
   const handleOnChange = (e) => {
     setProductDetail({ ...productDetail, [e.target.name]: e.target.value });
+  };
+  const updateImageFile=(img)=>{
+    setImageFile(img)
+    console.log(img);
+  }
+  const requestChange = async () => {
+    try {
+      if (
+        !productDetail._id ||
+        !productDetail.id ||
+        !productDetail.image ||
+        !productDetail.price ||
+        !productDetail.productDescription ||
+        !productDetail.productName ||
+        !productDetail.department
+      ) {
+        return toast.error("Filled the required data for Request");
+      }
+      const formData = new FormData();
+      formData.append("productId", productDetail._id);
+      formData.append("id", productDetail.id);
+      formData.append("image", productDetail.image);
+      formData.append("price", productDetail.price);
+      formData.append("productDescription", productDetail.productDescription);
+      formData.append("productName", productDetail.productName);
+      formData.append("department", productDetail.department);
+      if (imageFile) {
+        formData.append("imageFile", imageFile);
+      }
+      const res = await api.post("/review/add", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(res.data.message);
+      handleEditModeReset();
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response.data.message);
+    }
+  };
+  const saveChangeDirectly = async () => {
+    try {
+      if (
+        !productDetail._id ||
+        !productDetail.id ||
+        !productDetail.image ||
+        !productDetail.price ||
+        !productDetail.productDescription ||
+        !productDetail.productName ||
+        !productDetail.department
+      ) {
+        return toast.error("Filled the required data for Updating");
+      }
+      const formData = new FormData();
+      formData.append("_id", productDetail._id);
+      formData.append("id", productDetail.id);
+      formData.append("image", productDetail.image);
+      formData.append("price", productDetail.price);
+      formData.append("productDescription", productDetail.productDescription);
+      formData.append("productName", productDetail.productName);
+      formData.append("department", productDetail.department);
+      if (imageFile) {
+        formData.append("imageFile", imageFile);
+      }
+      const res = await api.patch("/product/update", formData, {
+        headers: { "Content-Type": "multipart/form-data" },
+      });
+      toast.success(res.data.message);
+      await getProductDetails();
+      handleEditModeReset();
+      navigate("/dashboard");
+    } catch (error) {
+      console.error(error);
+      toast.error(error.response.data.message);
+    }
+  };
+  const handleEditModeReset = () => {
+    setIsEditMode(false);
+    getProductDetails();
   };
   useEffect(() => {
     getProductDetails();
@@ -31,7 +114,7 @@ function ProductDetailsTab() {
           <p className="flex items-center gap-2 text-white bg-yellow-800 text-sm rounded-md px-2 font-bold">
             <b
               className="text-pink-300 text-xl cursor-pointer hover:text-pink-600"
-              onClick={() => setIsEditMode(false)}
+              onClick={() => handleEditModeReset()}
             >
               X
             </b>{" "}
@@ -56,26 +139,29 @@ function ProductDetailsTab() {
                 </p>
               </div>
             ) : (
-              <label
-                htmlFor="imageFile"
-                className="cursor-pointer"
-                title="Change Image"
-              >
-                <input
-                  type="file"
-                  name="imageFile"
-                  id="imageFile"
-                  multiple={false}
-                  className="hidden"
-                  onChange={(e) => setImageFile(e.target.files[0])}
-                />
-
+              // <label
+              //   htmlFor="imageFile"
+              //   className="cursor-pointer"
+              //   title="Change Image"
+              // >
+              //  <input
+              // type="file"
+              // name="imageFile"
+              // id="imageFile"
+              // multiple={false}
+              // className="hidden"
+              // onChange={(e) => setImageFile(e.target.files[0])}
+              // />
+              <>
                 <img
                   src={productDetail.image}
                   alt={productDetail.ProductName}
-                  className="w-52 h-52 object-cover rounded-md mb-4"
+                  onClick={() => setIsModalOpen(true)}
+                  className="w-52 h-52 object-cover rounded-md mb-4 cursor-pointer"
                 />
-              </label>
+                {isModalOpen && <Modal closeModal={()=>setIsModalOpen(false)} updateImageFile={updateImageFile} />}
+              </>
+              // </label>
             )
           ) : (
             <img
@@ -151,14 +237,14 @@ function ProductDetailsTab() {
           {isEditMode ? (
             user.data.role == "admin" ? (
               <button
-                onClick={() => {}}
+                onClick={() => saveChangeDirectly()}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
               >
                 Save
               </button>
             ) : user.data.role == "team member" ? (
               <button
-                onClick={() => {}}
+                onClick={() => requestChange()}
                 className="bg-blue-500 hover:bg-blue-600 text-white font-bold py-2 px-4 rounded"
               >
                 Request

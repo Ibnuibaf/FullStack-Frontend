@@ -23,7 +23,7 @@ function ProductsTab() {
   return (
     <div className="w-[50%] h-[70vh] overflow-x-scroll bg-gray-800 text-white">
       <table className="min-w-full divide-y divide-gray-700">
-        <thead className="bg-gray-600">
+        <thead className="bg-gray-600 sticky top-0">
           <tr>
             <th
               scope="col"
