@@ -77,7 +77,6 @@ function ReviewsTab() {
                         : ""
                     }-700`}
                   >
-                    {" "}
                     {review.status}
                   </p>
                 </td>
