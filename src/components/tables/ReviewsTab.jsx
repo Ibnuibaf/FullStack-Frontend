@@ -67,15 +67,15 @@ function ReviewsTab() {
                 </td>
                 <td className="px-6 py-4 whitespace-nowrap">
                   <p
-                    className={`bg-white rounded-md px-2 font-semibold text-${
+                    className={`bg-white rounded-md px-2 font-semibold ${
                       review.status == "pending"
-                        ? "orange"
+                        ? "text-orange-700"
                         : review.status == "approved"
-                        ? "green"
+                        ? "text-green-700"
                         : review.status == "rejected"
-                        ? "pink"
+                        ? "text-pink-700"
                         : ""
-                    }-700`}
+                    }`}
                   >
                     {review.status}
                   </p>
